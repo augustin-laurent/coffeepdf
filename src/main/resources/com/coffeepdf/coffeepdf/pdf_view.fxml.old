@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.coffeepdf.coffeepdf.presentation.PDFViewController" style="-fx-background-color: #e0e0e0;">
+    <!-- File Management Toolbar at the top -->
+    <top>
+        <ToolBar style="-fx-background-color: #f8cccc;">
+            <Button fx:id="openButton" text="Open PDF"/>
+            <Button fx:id="saveButton" text="Save"/>
+            <Button fx:id="exportButton" text="Export"/>
+            <!-- Add more file management buttons as needed -->
+        </ToolBar>
+    </top>
+
+    <!-- Main center area: PDF Preview and Command Panel -->
+    <center>
+        <HBox spacing="10" style="-fx-padding: 20;">
+            <!-- PDF Preview Area -->
+            <VBox style="-fx-background-color: #e7baba; -fx-pref-width: 65%; -fx-alignment: center;" alignment="CENTER" HBox.hgrow="ALWAYS">
+                <Label text="PDF Preview" style="-fx-font-size: 2em;" />
+                <StackPane fx:id="pdfPreviewPane" style="-fx-background-color: #fff; -fx-border-color: #ccc; -fx-border-width: 2;" minHeight="400" minWidth="350">
+                    <!-- Put an ImageView or Canvas here to render PDF pages -->
+                    <Label fx:id="noPdfLabel" text="No PDF Loaded" />
+                </StackPane>
+            </VBox>
+
+            <!-- PDF Command Area -->
+            <VBox style="-fx-background-color: #e7baba; -fx-pref-width: 35%; -fx-alignment: center;" alignment="CENTER">
+                <Label text="PDF Command" style="-fx-font-size: 2em;" />
+                <Button fx:id="rotateButton" text="Rotate Page"/>
+                <Button fx:id="annotateButton" text="Add Annotation"/>
+                <Button fx:id="signButton" text="Sign PDF"/>
+                <!-- Add more buttons as you need -->
+            </VBox>
+        </HBox>
+    </center>
+</BorderPane>

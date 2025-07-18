@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.coffeepdf.coffeepdf.presentation.PDFViewController"
+            style="-fx-background-color: #ededed;">
+
+    <!-- Top Toolbar -->
+    <top>
+        <ToolBar style="-fx-background-color: #f8f8f8;">
+            <Button fx:id="openButton" text="Open"/>
+            <Button fx:id="saveButton" text="Save"/>
+            <Button fx:id="exportButton" text="Export"/>
+            <Separator orientation="VERTICAL"/>
+            <Button fx:id="rotateButton" text="⟲"/>
+            <Button fx:id="annotateButton" text="Annotate"/>
+            <Button fx:id="signButton" text="Sign"/>
+            <Region fx:id="spacer" HBox.hgrow="ALWAYS"/>
+            <Label fx:id="pageLabel" text="Page 1/1"/>
+        </ToolBar>
+    </top>
+
+    <!-- Left Sidebar for Thumbnails -->
+    <left>
+        <ListView fx:id="thumbnailListView"
+                  prefWidth="110"
+                  style="-fx-background-color: #f4f4f4; -fx-border-width: 0 1 0 0; -fx-border-color: #cccccc;">
+        </ListView>
+    </left>
+
+    <!-- Main PDF Preview Area -->
+    <center>
+        <StackPane fx:id="pdfPreviewPane" style="-fx-background-color: #ffffff; -fx-padding: 24;">
+            <Label fx:id="noPdfLabel"
+                   text="No PDF Loaded"
+                   style="-fx-font-size: 2em; -fx-text-fill: #888888;"
+                   visible="true"/>
+        </StackPane>
+    </center>
+
+</BorderPane>
