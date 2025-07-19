@@ -1,0 +1,165 @@
+@startuml
+
+' Domain Layer
+class PDFDocument {
+  - UUID id
+  - String name
+  - List<Page> pages
+  - List<Annotation> annotations
+  - List<Signature> signatures
+  --
+  + addPage(Page page)
+  + removePage(int pageNumber)
+  + getPage(int pageNumber): Page
+  + exportPages(List<Integer> pageNumbers): PDFDocument
+}
+
+class Page {
+  - int pageNumber
+  - int rotationAngle
+  - byte[] content
+  --
+  + rotate(int angle)
+  + clearContent()
+  + extractText(): String
+}
+
+class Annotation {
+  - UUID id
+  - AnnotationType type
+  - int pageNumber
+  - String content
+  - Rectangle coordinates
+  --
+  + editContent(String newContent)
+  + move(Rectangle newCoordinates)
+}
+
+class Signature {
+  - UUID id
+  - String signerName
+  - LocalDateTime signedDate
+  - byte[] certificate
+  - Rectangle coordinates
+  --
+  + verify(): boolean
+}
+
+enum AnnotationType {
+  HIGHLIGHT
+  COMMENT
+  SHAPE
+}
+
+class Rectangle {
+  - double x
+  - double y
+  - double width
+  - double height
+}
+
+' Application Layer
+class PDFService {
+  + convertImagesToPDF(List<String> imagePaths): PDFDocument
+  + deletePages(PDFDocument pdf, List<Integer> pages)
+  + rotatePages(PDFDocument pdf, Map<Integer,Integer> rotations)
+  + exportPages(PDFDocument pdf, List<Integer> pages): PDFDocument
+}
+
+class OCRService {
+  + extractText(PDFDocument pdf): Map<Integer,String>
+  + extractTextFromPage(Page page): String
+}
+
+class AnnotationService {
+  + addAnnotation(PDFDocument pdf, Annotation annotation)
+  + editAnnotation(PDFDocument pdf, UUID annotationId, String newContent)
+  + removeAnnotation(PDFDocument pdf, UUID annotationId)
+}
+
+class SignatureService {
+  + signDocument(PDFDocument pdf, Signature signature)
+  + verifySignature(PDFDocument pdf, UUID signatureId): boolean
+}
+
+' Infrastructure Layer
+interface OCRProvider {
+  + performOCR(byte[] imageData): String
+}
+
+class Tess4JOCRProvider implements OCRProvider {
+  + performOCR(byte[] imageData): String
+}
+
+interface CryptoProvider {
+  + createSignature(byte[] pdfContent, Certificate cert): byte[]
+  + verifySignature(byte[] pdfContent, byte[] signature): boolean
+}
+
+class BouncyCastleCryptoProvider implements CryptoProvider {
+  + createSignature(byte[] pdfContent, Certificate cert): byte[]
+  + verifySignature(byte[] pdfContent, byte[] signature): boolean
+}
+
+class PDFRepository {
+  + save(PDFDocument document, String path)
+  + load(String path): PDFDocument
+}
+
+' Presentation Layer (Controllers)
+class PDFController {
+  - PDFService pdfService
+  - PDFDocument currentDocument
+  --
+  + handleOpenPDF()
+  + handleSavePDF()
+  + handleDeletePages()
+  + handleRotatePages()
+  + handleExportPages()
+}
+
+class AnnotationController {
+  - AnnotationService annotationService
+  --
+  + handleAddAnnotation()
+  + handleEditAnnotation()
+  + handleRemoveAnnotation()
+}
+
+class SignatureController {
+  - SignatureService signatureService
+  --
+  + handleSignDocument()
+  + handleVerifySignature()
+}
+
+' Common Utilities
+class LoggerUtil {
+  + {static} info(String msg)
+  + {static} error(String msg)
+  + {static} warn(String msg)
+}
+
+class FileManager {
+  + {static} openFileChooser(Stage stage): String
+  + {static} saveFileChooser(Stage stage): String
+}
+
+' Relationships
+PDFDocument "1" -- "*" Page
+PDFDocument "1" -- "*" Annotation
+PDFDocument "1" -- "*" Signature
+
+PDFService ..> PDFDocument
+OCRService ..> Page
+AnnotationService ..> Annotation
+SignatureService ..> Signature
+
+Tess4JOCRProvider ..|> OCRProvider
+BouncyCastleCryptoProvider ..|> CryptoProvider
+
+PDFController --> PDFService
+AnnotationController --> AnnotationService
+SignatureController --> SignatureService
+
+@enduml

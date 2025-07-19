@@ -4,9 +4,12 @@ import com.coffeepdf.coffeepdf.application.PDFService;
 import com.coffeepdf.coffeepdf.application.PDFServiceImpl;
 import com.coffeepdf.coffeepdf.domain.PDFDocument;
 import com.coffeepdf.coffeepdf.domain.Page;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -20,9 +23,26 @@ class PDFServiceTest {
     @BeforeEach
     void setUp() {
         document = new PDFDocument(UUID.randomUUID(), "Sample PDF");
-        document.addPage(new Page(1, new byte[0]));
-        document.addPage(new Page(2, new byte[0]));
+
+        byte[] validPdfContent1 = createValidPdfContent();
+        byte[] validPdfContent2 = createValidPdfContent();
+
+        document.addPage(new Page(1, validPdfContent1));
+        document.addPage(new Page(2, validPdfContent2));
         pdfService = new PDFServiceImpl();
+    }
+
+    private byte[] createValidPdfContent() {
+        try {
+            PDDocument doc = new PDDocument();
+            doc.addPage(new PDPage());
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            doc.save(baos);
+            doc.close();
+            return baos.toByteArray();
+        } catch (Exception e) {
+            return "%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj 2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj 3 0 obj<</Type/Page/Parent 2 0 R>>endobj xref 0 4 0000000000 65535 f 0000000010 00000 n 0000000053 00000 n 0000000125 00000 n trailer<</Size 4/Root 1 0 R>> startxref 173 %%EOF".getBytes();
+        }
     }
 
     @Test
