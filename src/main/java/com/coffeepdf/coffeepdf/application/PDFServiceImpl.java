@@ -17,6 +17,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -71,7 +72,7 @@ public class PDFServiceImpl implements PDFService {
     @Override
     public PDFDocument deletePages(PDFDocument pdf, List<Integer> pageNumbers) {
         pageNumbers.stream()
-                .sorted((a, b) -> Integer.compare(b, a))
+                .sorted(Collections.reverseOrder())
                 .forEach(pageNumber -> {
                     Page pageToRemove = pdf.getPage(pageNumber);
                     if (pageToRemove != null) {
