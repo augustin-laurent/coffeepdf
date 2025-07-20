@@ -112,6 +112,64 @@ class PDFServiceImplTest {
     }
 
     @Test
+    void testConvertImagesToPDFWithNonExistentFiles() {
+        List<String> invalidImagePaths = List.of("nonexistent1.png", "nonexistent2.jpg");
+
+        PDFDocument result = pdfService.convertImagesToPDF(invalidImagePaths);
+
+        assertNotNull(result);
+        assertEquals("converted_images.pdf", result.getName());
+        assertEquals(0, result.getPages().size());
+    }
+
+    @Test
+    void testConvertImagesToPDFWithMixedValidAndInvalidFiles() {
+        List<String> mixedPaths = List.of(
+                "src/test/resources/image1.png",
+                "nonexistent.jpg",
+                "invalid_path.png"
+        );
+
+        PDFDocument result = pdfService.convertImagesToPDF(mixedPaths);
+
+        assertNotNull(result);
+        assertEquals("converted_images.pdf", result.getName());
+    }
+
+    @Test
+    void testConvertImagesToPDFWithEmptyList() {
+        List<String> emptyList = List.of();
+
+        PDFDocument result = pdfService.convertImagesToPDF(emptyList);
+
+        assertNotNull(result);
+        assertEquals("converted_images.pdf", result.getName());
+        assertEquals(0, result.getPages().size());
+    }
+
+    @Test
+    void testExportPagesWithNonExistentPageNumbers() {
+        List<Integer> nonExistentPages = List.of(99, 100);
+
+        PDFDocument exportedDocument = pdfService.exportPages(document, nonExistentPages);
+
+        assertNotNull(exportedDocument);
+        assertEquals(0, exportedDocument.getPages().size());
+        assertEquals("exported_Sample PDF", exportedDocument.getName());
+    }
+
+    @Test
+    void testExportPagesWithEmptyList() {
+        List<Integer> emptyList = List.of();
+
+        PDFDocument exportedDocument = pdfService.exportPages(document, emptyList);
+
+        assertNotNull(exportedDocument);
+        assertEquals(0, exportedDocument.getPages().size());
+        assertEquals("exported_Sample PDF", exportedDocument.getName());
+    }
+
+    @Test
     void testExportPages() {
         List<Integer> pagesToExport = List.of(1);
 
