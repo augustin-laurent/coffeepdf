@@ -1,5 +1,7 @@
 package com.coffeepdf.coffeepdf.domain;
 
+import org.apache.pdfbox.pdmodel.PDDocument;
+
 import java.util.*;
 
 /**
@@ -19,6 +21,8 @@ public class PDFDocument {
     private final List<Signature> signatures = new ArrayList<>();
     // Source path of the PDF document, used for loading and saving
     private final String sourcePath;
+    // In-memory representation of the PDF document, used for operations without file I/O
+    private PDDocument inMemoryDocument;
 
     /**
      * Creates a PDF document with the specified unique identifier and name.
@@ -138,5 +142,32 @@ public class PDFDocument {
      */
     public String getSourcePath() {
         return sourcePath;
+    }
+
+    /**
+     * Sets the in-memory representation of the PDF document.
+     *
+     * @param document the PDDocument object representing the PDF document in memory
+     */
+    public void setInMemoryDocument(PDDocument document) {
+        inMemoryDocument = document;
+    }
+
+    /**
+     * Returns the in-memory representation of the PDF document.
+     *
+     * @return the PDDocument object representing the PDF document in memory
+     */
+    public PDDocument getInMemoryDocument() {
+        return inMemoryDocument;
+    }
+
+    /**
+     * Returns the status of the in-memory document.
+     *
+     * @return true if the in-memory document is not null, false otherwise
+     */
+    public boolean hasInMemoryDocument() {
+        return inMemoryDocument != null;
     }
 }

@@ -30,7 +30,6 @@ public class PDFRepositoryImpl implements PDFRepository {
             for (int i = 0; i < document.getNumberOfPages(); i++) {
                 PDPage pdPage = document.getPage(i);
 
-                // 150 DPI is a common resolution for rendering PDF pages, might create a settings later on to adjust it.
                 BufferedImage image = renderer.renderImageWithDPI(i, 150);
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 ImageIO.write(image, "PNG", baos);
@@ -47,19 +46,35 @@ public class PDFRepositoryImpl implements PDFRepository {
 
     @Override
     public void save(PDFDocument document, String path) {
-        try (PDDocument sourceDoc = PDDocument.load(new File(document.getSourcePath()));
-             PDDocument newDoc = new PDDocument()) {
-            for (Page page : document.getPages()) {
-                PDPage originalPage = sourceDoc.getPage(page.getPageNumber() - 1);
-
-                newDoc.importPage(originalPage);
-
-                PDPage newPage = newDoc.getPage(newDoc.getNumberOfPages() - 1);
-                newPage.setRotation(page.getRotationAngle());
+        if (document.hasInMemoryDocument()) {
+            try (PDDocument newDoc = new PDDocument()) {
+                PDDocument sourceDoc = document.getInMemoryDocument();
+                copyPagesWithRotation(document, sourceDoc, newDoc);
+                newDoc.save(path);
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to save PDF to path: " + path, e);
             }
-            newDoc.save(path);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to save PDF to path: " + path, e);
+        } else {
+            try (PDDocument sourceDoc = PDDocument.load(new File(document.getSourcePath()));
+                 PDDocument newDoc = new PDDocument()) {
+                copyPagesWithRotation(document, sourceDoc, newDoc);
+                newDoc.save(path);
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to save PDF to path: " + path, e);
+            }
         }
+    }
+
+    private void copyPagesWithRotation(PDFDocument document, PDDocument sourceDoc, PDDocument newDoc) {
+        document.getPages().forEach(page -> {
+            PDPage originalPage = sourceDoc.getPage(page.getPageNumber() - 1);
+            try {
+                newDoc.importPage(originalPage);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            PDPage newPage = newDoc.getPage(newDoc.getNumberOfPages() - 1);
+            newPage.setRotation(page.getRotationAngle());
+        });
     }
 }
