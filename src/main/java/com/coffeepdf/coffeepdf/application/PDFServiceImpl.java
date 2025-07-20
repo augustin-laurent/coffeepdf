@@ -69,15 +69,16 @@ public class PDFServiceImpl implements PDFService {
     }
 
     @Override
-    public PDFDocument deletePages(PDFDocument pdf, List<Integer> pages) {
-        List<Page> remainingPages = pdf.getPages().stream()
-                .filter(page -> !pages.contains(page.getPageNumber()))
-                .toList();
-
-        PDFDocument newPdf = new PDFDocument(UUID.randomUUID(), pdf.getName());
-        remainingPages.forEach(newPdf::addPage);
-
-        return newPdf;
+    public PDFDocument deletePages(PDFDocument pdf, List<Integer> pageNumbers) {
+        pageNumbers.stream()
+                .sorted((a, b) -> Integer.compare(b, a))
+                .forEach(pageNumber -> {
+                    Page pageToRemove = pdf.getPage(pageNumber);
+                    if (pageToRemove != null) {
+                        pdf.getPages().remove(pageToRemove);
+                    }
+                });
+        return pdf;
     }
 
     @Override
@@ -86,15 +87,21 @@ public class PDFServiceImpl implements PDFService {
                 .filter(page -> rotations.containsKey(page.getPageNumber()))
                 .forEach(page -> {
                     int angle = rotations.get(page.getPageNumber());
-                    try (PDDocument pdDoc = PDDocument.load(page.getContent())) {
-                        PDPage pdPage = pdDoc.getPage(0);
-                        pdPage.setRotation(angle);
-                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                        pdDoc.save(baos);
-                        page.setContent(baos.toByteArray());
-                        page.setRotationAngle(angle);
-                    } catch (Exception e) {
-                        logger.error(e.getMessage());
+
+                    if (page.getContent() != null && page.getContent().length > 0) {
+                        try (PDDocument pdDoc = PDDocument.load(page.getContent())) {
+                            PDPage pdPage = pdDoc.getPage(0);
+                            pdPage.setRotation(angle);
+                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                            pdDoc.save(baos);
+                            page.setContent(baos.toByteArray());
+
+                            page.setRotationAngle(angle);
+                        } catch (Exception e) {
+                            logger.error("Failed to rotate page content: {}", e.getMessage());
+                        }
+                    } else {
+                        logger.warn("Skipping rotation for page {} due to null or empty content", page.getPageNumber());
                     }
                 });
         return pdf;

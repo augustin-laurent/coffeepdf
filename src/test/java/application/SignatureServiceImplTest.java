@@ -14,7 +14,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class SignatureServiceTest {
+class SignatureServiceImplTest {
     private PDFDocument document;
     private SignatureService signatureService;
     private Signature signature;
