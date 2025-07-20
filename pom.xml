@@ -24,8 +24,7 @@
         <logback.version>1.5.13</logback.version>
         <sonar.organization>augustin-laurent</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-        <sonar.coverage.exclusions>**/infrastructure/**</sonar.coverage.exclusions>
-        <sonar.coverage.exclusions>**/presentation/**</sonar.coverage.exclusions>
+        <sonar.coverage.exclusions>**/infrastructure/**,**/presentation/**</sonar.coverage.exclusions>
     </properties>
 
     <dependencies>
