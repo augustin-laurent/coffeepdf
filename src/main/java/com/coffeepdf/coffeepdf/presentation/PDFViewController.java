@@ -423,8 +423,29 @@ public class PDFViewController {
     }
 
     private void savePdfFile() {
-        // TODO: Implement PDF save logic
-        showAlert("Save PDF", "Save PDF functionality not yet implemented.");
+        PDFDocument currentDoc = pdfController.getCurrentDocument();
+        if (currentDoc == null) {
+            showAlert("No PDF", "Please open a PDF file first.");
+            return;
+        }
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save PDF File");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Files", "*.pdf"));
+
+        if (currentDoc.getName() != null) {
+            fileChooser.setInitialFileName(currentDoc.getName());
+        }
+
+        File file = fileChooser.showSaveDialog(getStage());
+        if (file != null) {
+            try {
+                pdfController.handleSavePDF(file.getAbsolutePath());
+                showAlert("Success", "PDF saved successfully.");
+            } catch (Exception e) {
+                showAlert("Error", "Failed to save PDF: " + e.getMessage());
+            }
+        }
     }
 
     private void exportPdfFile() {

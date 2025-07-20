@@ -17,6 +17,8 @@ public class PDFDocument {
     private final List<Annotation> annotations = new ArrayList<>();
     // List of signatures in the PDF document
     private final List<Signature> signatures = new ArrayList<>();
+    // Source path of the PDF document, used for loading and saving
+    private final String sourcePath;
 
     /**
      * Creates a PDF document with the specified unique identifier and name.
@@ -27,6 +29,20 @@ public class PDFDocument {
     public PDFDocument(UUID idArg, String nameArg) {
         id = idArg;
         name = nameArg;
+        sourcePath = null;
+    }
+
+    /**
+     * Creates a PDF document with the specified unique identifier and name and original path.
+     *
+     * @param idArg   the unique identifier for the PDF document
+     * @param nameArg the name of the PDF document
+     * @param sourcePathArg the path to the PDF document
+     */
+    public PDFDocument(UUID idArg, String nameArg, String sourcePathArg) {
+        id = idArg;
+        name = nameArg;
+        sourcePath = sourcePathArg;
     }
 
     /**
@@ -113,5 +129,14 @@ public class PDFDocument {
      */
     public void addSignature(Signature signature) {
         signatures.add(signature);
+    }
+
+    /**
+     * Return the source path of the PDF document.
+     *
+     * @return the source path as a String
+     */
+    public String getSourcePath() {
+        return sourcePath;
     }
 }
