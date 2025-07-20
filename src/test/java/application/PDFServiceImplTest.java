@@ -95,4 +95,32 @@ class PDFServiceImplTest {
         assertNull(document.getPage(1));
         assertNotNull(document.getPage(2));
     }
+
+    @Test
+    void testConvertImagesToPDF() {
+        String imagePath1 = "src/test/resources/image1.png";
+        String imagePath2 = "src/test/resources/image2.png";
+        List<String> imagePaths = List.of(imagePath1, imagePath2);
+
+        PDFDocument result = pdfService.convertImagesToPDF(imagePaths);
+
+        assertNotNull(result);
+        assertEquals(2, result.getPages().size());
+        assertEquals("converted_images.pdf", result.getName());
+        assertNotNull(result.getPage(1));
+        assertNotNull(result.getPage(2));
+    }
+
+    @Test
+    void testExportPages() {
+        List<Integer> pagesToExport = List.of(1);
+
+        PDFDocument exportedDocument = pdfService.exportPages(document, pagesToExport);
+
+        assertNotNull(exportedDocument);
+        assertEquals(1, exportedDocument.getPages().size());
+        assertEquals("exported_Sample PDF", exportedDocument.getName());
+        assertNotNull(exportedDocument.getPage(1));
+        assertNull(exportedDocument.getPage(2));
+    }
 }
