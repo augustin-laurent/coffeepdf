@@ -76,7 +76,7 @@ public class PDFServiceImpl implements PDFService {
                 .forEach(pageNumber -> {
                     Page pageToRemove = pdf.getPage(pageNumber);
                     if (pageToRemove != null) {
-                        pdf.getPages().remove(pageToRemove);
+                        pdf.removePage(pageNumber);
                     }
                 });
         return pdf;
