@@ -3,8 +3,48 @@ on:
   push:
     branches:
       - main
+        - master
+        - develop
+        - staging
+        - production
+        - 'feature/**'
+        - 'bugfix/**'
+        - 'hotfix/**'
+        - 'release/**'
+        - 'develop/**'
+        - 'staging/**'
+        - 'qa/**'
+        - 'test/**'
+        - 'ci/**'
+        - 'cd/**'
+        - 'perf/**'
+        - 'performance/**'
+        - 'docs/**'
+        - 'documentation/**'
+        - 'config/**'
+        - 'refactor/**'
+        - 'chore/**'
+        - 'improvement/**'
+        - 'enhancement/**'
+        - 'update/**'
+        - 'upgrade/**'
+        - 'security/**'
+        - 'fix/**'
+        - 'patch/**'
+        - 'wip/**'
+        - 'experimental/**'
+        - 'poc/**'
+        - 'prototype/**'
+        - 'spike/**'
   pull_request:
     types: [opened, synchronize, reopened]
+    branches:
+      - main
+      - master
+      - develop
+      - staging
+      - production
+  workflow_dispatch:
 jobs:
   build:
     name: Build and analyze
