@@ -16,7 +16,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class PDFServiceTest {
+class PDFServiceImplTest {
     private PDFDocument document;
     private PDFService pdfService;
 
