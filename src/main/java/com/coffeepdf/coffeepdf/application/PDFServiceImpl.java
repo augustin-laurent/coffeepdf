@@ -30,44 +30,48 @@ public class PDFServiceImpl implements PDFService {
 
     @Override
     public PDFDocument convertImagesToPDF(List<String> imagePaths) {
-        PDDocument document = new PDDocument();
+        try (PDDocument document = new PDDocument()) {
+            imagePaths.forEach(imagePath -> {
+                try {
+                    BufferedImage image = ImageIO.read(new File(imagePath));
+                    PDImageXObject pdImage = LosslessFactory.createFromImage(document, image);
 
-        imagePaths.forEach(imagePath -> {
+                    PDPage page = new PDPage(new PDRectangle(image.getWidth(), image.getHeight()));
+                    document.addPage(page);
+
+                    try (PDPageContentStream contentStream = new PDPageContentStream(document, page)) {
+                        contentStream.drawImage(pdImage, 0, 0);
+                    }
+                } catch (IOException e) {
+                    logger.error("Failed to add image to PDF: {}", imagePath, e);
+                }
+            });
+
+            PDFDocument pdfDoc = new PDFDocument(UUID.randomUUID(), "converted_images.pdf");
+            pdfDoc.setInMemoryDocument(document);
+
+            PDFRenderer renderer = new PDFRenderer(document);
+
             try {
-                BufferedImage image = ImageIO.read(new File(imagePath));
-                PDImageXObject pdImage = LosslessFactory.createFromImage(document, image);
+                for (int i = 0; i < document.getNumberOfPages(); i++) {
+                    BufferedImage pageImage = renderer.renderImageWithDPI(i, 150);
+                    ByteArrayOutputStream pageContentStream = new ByteArrayOutputStream();
+                    ImageIO.write(pageImage, "PNG", pageContentStream);
 
-                PDPage page = new PDPage(new PDRectangle(image.getWidth(), image.getHeight()));
-                document.addPage(page);
-
-                try (PDPageContentStream contentStream = new PDPageContentStream(document, page)) {
-                    contentStream.drawImage(pdImage, 0, 0);
+                    Page page = new Page(i + 1, 0, pageContentStream.toByteArray());
+                    pdfDoc.addPage(page);
                 }
             } catch (IOException e) {
-                logger.error("Failed to add image to PDF: {}", imagePath, e);
+                logger.error("Failed to render pages from PDF document: {}", e.getMessage());
             }
-        });
 
-        PDFDocument pdfDoc = new PDFDocument(UUID.randomUUID(), "converted_images.pdf");
-        pdfDoc.setInMemoryDocument(document);
-
-        PDFRenderer renderer = new PDFRenderer(document);
-
-        try {
-            for (int i = 0; i < document.getNumberOfPages(); i++) {
-                BufferedImage pageImage = renderer.renderImageWithDPI(i, 150);
-                ByteArrayOutputStream pageContentStream = new ByteArrayOutputStream();
-                ImageIO.write(pageImage, "PNG", pageContentStream);
-
-                Page page = new Page(i + 1, 0, pageContentStream.toByteArray());
-                pdfDoc.addPage(page);
-            }
+            return pdfDoc;
         } catch (IOException e) {
-            logger.error("Failed to render pages from PDF document: {}", e.getMessage());
+            logger.error("Failed to create PDF document", e);
+            throw new RuntimeException("PDF creation failed", e);
         }
-
-        return pdfDoc;
     }
+
 
     @Override
     public PDFDocument deletePages(PDFDocument pdf, List<Integer> pageNumbers) {
