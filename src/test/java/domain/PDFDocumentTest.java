@@ -24,7 +24,7 @@ class PDFDocumentTest {
     void setUp() throws IOException {
         testPdfPath = tempDir.resolve("test.pdf");
         Files.createFile(testPdfPath);
-        pdfDocument = new PDFDocument(UUID.randomUUID(), "test.pdf",testPdfPath.toString());
+        pdfDocument = new PDFDocument(UUID.randomUUID(), "test.pdf", testPdfPath.toString());
     }
 
     @Test
