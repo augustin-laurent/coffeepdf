@@ -52,18 +52,7 @@ public class PDFServiceImpl implements PDFService {
 
             PDFRenderer renderer = new PDFRenderer(document);
 
-            try {
-                for (int i = 0; i < document.getNumberOfPages(); i++) {
-                    BufferedImage pageImage = renderer.renderImageWithDPI(i, 150);
-                    ByteArrayOutputStream pageContentStream = new ByteArrayOutputStream();
-                    ImageIO.write(pageImage, "PNG", pageContentStream);
-
-                    Page page = new Page(i + 1, 0, pageContentStream.toByteArray());
-                    pdfDoc.addPage(page);
-                }
-            } catch (IOException e) {
-                logger.error("Failed to render pages from PDF document: {}", e.getMessage());
-            }
+            renderPagesToPdfDoc(renderer, document, pdfDoc);
 
             return pdfDoc;
         } catch (IOException e) {
@@ -72,6 +61,20 @@ public class PDFServiceImpl implements PDFService {
         }
     }
 
+    private void renderPagesToPdfDoc(PDFRenderer renderer, PDDocument document, PDFDocument pdfDoc) {
+        try {
+            for (int i = 0; i < document.getNumberOfPages(); i++) {
+                BufferedImage pageImage = renderer.renderImageWithDPI(i, 150);
+                ByteArrayOutputStream pageContentStream = new ByteArrayOutputStream();
+                ImageIO.write(pageImage, "PNG", pageContentStream);
+
+                Page page = new Page(i + 1, 0, pageContentStream.toByteArray());
+                pdfDoc.addPage(page);
+            }
+        } catch (IOException e) {
+            logger.error("Failed to render pages from PDF document: {}", e.getMessage());
+        }
+    }
 
     @Override
     public PDFDocument deletePages(PDFDocument pdf, List<Integer> pageNumbers) {
