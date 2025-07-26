@@ -47,12 +47,22 @@ public class PDFServiceImpl implements PDFService {
                 }
             });
 
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            document.save(baos);
-
             PDFDocument pdfDoc = new PDFDocument(UUID.randomUUID(), "converted_images.pdf");
+            pdfDoc.setInMemoryDocument(document);
+
             PDFRenderer renderer = new PDFRenderer(document);
 
+            renderPagesToPdfDoc(renderer, document, pdfDoc);
+
+            return pdfDoc;
+        } catch (IOException e) {
+            logger.error("Failed to create PDF document", e);
+            throw new RuntimeException("PDF creation failed", e);
+        }
+    }
+
+    private void renderPagesToPdfDoc(PDFRenderer renderer, PDDocument document, PDFDocument pdfDoc) {
+        try {
             for (int i = 0; i < document.getNumberOfPages(); i++) {
                 BufferedImage pageImage = renderer.renderImageWithDPI(i, 150);
                 ByteArrayOutputStream pageContentStream = new ByteArrayOutputStream();
@@ -61,11 +71,8 @@ public class PDFServiceImpl implements PDFService {
                 Page page = new Page(i + 1, 0, pageContentStream.toByteArray());
                 pdfDoc.addPage(page);
             }
-
-            return pdfDoc;
         } catch (IOException e) {
-            logger.error("Failed to convert images to PDF", e);
-            throw new RuntimeException("Failed to convert images to PDF", e);
+            logger.error("Failed to render pages from PDF document: {}", e.getMessage());
         }
     }
 
@@ -76,7 +83,7 @@ public class PDFServiceImpl implements PDFService {
                 .forEach(pageNumber -> {
                     Page pageToRemove = pdf.getPage(pageNumber);
                     if (pageToRemove != null) {
-                        pdf.getPages().remove(pageToRemove);
+                        pdf.removePage(pageNumber);
                     }
                 });
         return pdf;
